@@ -1,0 +1,58 @@
+import ipywidgets as widgets
+from IPython.display import display
+
+# Function to count keyword occurrences
+def count_keywords(text, keywords):
+    count = 0
+    for word in keywords:
+        count += text.lower().count(word)
+    return count
+
+# Classify reviews based on counts
+def classify(row):
+    if row['food_count'] > row['service_count']:
+        return 'Food'
+    elif row['food_count'] < row['service_count']:
+        return 'Service'
+    else:
+        return 'Neutral'
+
+def analyze_review(review_text):
+    keywords_food = ['sick', 'food poisoning', 'hair', 'gross', 'portion', 'taste', 'dry', 'fresh', 'tasted', 'food', 'seasoned', 'bland', 'stale', 'tasty', 'tasted', 'texture', 'cooked', 'bite', 'crispy', 'soggy', 'raw', 'delicious']
+    keywords_service = ['service', 'waiter', 'waitress', 'staff', 'hospitality','employee', 'driver', 'cook', 'manager', 'pissed', 'disrespectful', 'treated', 'experience', 'team', 'operating', 'operation', 'waitress', 'waiter', 'customer service', 'greet', 'apology', 'rude', 'condescending', 'angry', 'atmosphere', 'vibe', 'request' , 'requested', 'service', 'slow', 'minutes', 'hours', 'arrived', 'closing', 'close', 'closed', 'wait', 'waiting', 'price', 'pricing', 'prices', 'server', 'loud', 'environment', 'staff', 'friendly', 'place', 'location', 'wave', 'ambience', 'forgot', 'forgetting', 'wrong', 'establishment', 'pricey', 'owner', 'interior', 'clean', 'comfortable', 'greeted', 'attentive']
+
+
+    food_count = count_keywords(review_text, keywords_food)
+    service_count = count_keywords(review_text, keywords_service)
+
+    category = classify({'food_count': food_count, 'service_count': service_count})
+    
+    return category, {'Food': food_count, 'Service': service_count}
+
+# Text box for user input
+review_textbox = widgets.Textarea(
+    placeholder='Write your review here...',
+    description='Review:',
+    disabled=False
+)
+
+# Button 
+analyze_button = widgets.Button(description="Analyze")
+
+# Output widget to display results
+output = widgets.Output()
+
+def on_analyze_button_clicked(b):
+    with output:
+        output.clear_output()
+        review = review_textbox.value
+        category, counts = analyze_review(review)
+        print(f"Category: {category}")
+        print("Score:")
+        for key, value in counts.items():
+            print(f"{key}: {value}")
+
+analyze_button.on_click(on_analyze_button_clicked)
+
+
+display(review_textbox, analyze_button, output)
